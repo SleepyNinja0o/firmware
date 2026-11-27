@@ -1,0 +1,14 @@
+#!/bin/sh
+# PTZ setup for hi3518ev100 (GPIO stepper pan/tilt)
+DEFAULT_PINS='78 75 79 76 74 73 77 72'
+
+case "$1" in
+  start)
+    # Set motor pins only if missing, so later changes made on the camera are kept
+    [ -n "$(fw_printenv -n gpio_motors 2>/dev/null)" ] || fw_setenv gpio_motors "$DEFAULT_PINS"
+    # Switch motor pins to GPIO mode (from vendor init script)
+    for r in 0x200f0120 0x200f0124 0x200f0128 0x200f012c 0x200f0130; do
+      devmem $r 32 0x0
+    done
+    ;;
+esac
